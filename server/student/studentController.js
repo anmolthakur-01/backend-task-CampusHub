@@ -83,66 +83,66 @@ const add = (req, res) => {
     });
 };
 
-// const login = (req, res) => {
-//   var validationerror = [];
-//   if (!req.body.email) validationerror.push("email is required");
-//   if (!req.body.password) validationerror.push("password is required");
-//   if (validationerror.length > 0) {
-//     res.send({
-//       status: 404,
-//       success: false,
-//       message: "validationerror error occur",
-//       error: validationerror,
-//     });
-//   } else {
-//     User.findOne({ email: req.body.email })
-//       .then((userdata) => {
-//         if (!userdata) {
-//           res.send({
-//             status: 420,
-//             success: false,
-//             message: "invalid email",
-//           });
-//         } else {
-//           bcrypt.compare(
-//             req.body.password,
-//             userdata.password,
-//             (err, result) => {
-//               if (!result) {
-//                 res.send({
-//                   status: 420,
-//                   success: false,
-//                   message: "invalid password",
-//                 });
-//               } else {
-//                 var tokenObj = {
-//                   _id: userdata._id,
-//                   email: userdata.email,
-//                   userType: userdata.userType,
-//                 };
-//                 var token = jwt.sign(tokenObj, privateKey);
-//                 res.send({
-//                   status: 200,
-//                   success: true,
-//                   message: "Login Successfully !!",
-//                   token: token,
-//                   data: userdata,
-//                 });
-//               }
-//             }
-//           );
-//         }
-//       })
-//       .catch((err) => {
-//         res.send({
-//           status: 500,
-//           success: false,
-//           message: "Internal server error",
-//           error: err.message,
-//         });
-//       });
-//   }
-// };
+const login = (req, res) => {
+  var validationerror = [];
+  if (!req.body.email) validationerror.push("email is required");
+  if (!req.body.password) validationerror.push("password is required");
+  if (validationerror.length > 0) {
+    res.send({
+      status: 404,
+      success: false,
+      message: "validationerror error occur",
+      error: validationerror,
+    });
+  } else {
+    User.findOne({ email: req.body.email })
+      .then((userdata) => {
+        if (!userdata) {
+          res.send({
+            status: 420,
+            success: false,
+            message: "invalid email",
+          });
+        } else {
+          bcrypt.compare(
+            req.body.password,
+            userdata.password,
+            (err, result) => {
+              if (!result) {
+                res.send({
+                  status: 420,
+                  success: false,
+                  message: "invalid password",
+                });
+              } else {
+                var tokenObj = {
+                  _id: userdata._id,
+                  email: userdata.email,
+                  userType: userdata.userType,
+                };
+                var token = jwt.sign(tokenObj, privateKey);
+                res.send({
+                  status: 200,
+                  success: true,
+                  message: "Login Successfully !!",
+                  token: token,
+                  data: userdata,
+                });
+              }
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        res.send({
+          status: 500,
+          success: false,
+          message: "Internal server error",
+          error: err.message,
+        });
+      });
+  }
+};
 
 const getAll = (req, res) => {
   Student.find()
@@ -328,7 +328,7 @@ const deletestudent = (req, res) => {
 
 module.exports = {
   add,
-  // login,
+  login,
   getAll,
   getSingle,
   update,

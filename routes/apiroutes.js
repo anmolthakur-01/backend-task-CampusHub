@@ -50,7 +50,7 @@ router.post("/public/delete", publicController.deletepublic);
 
 // student routes
 router.post("/student/add", studentUpload.single('studentPhoto'), studentController.add);
-// router.post("/student/login", studentController.login);
+router.post("/student/login", studentController.login);
 router.post("/student/getall", studentController.getAll);
 router.post("/student/getsingle", studentController.getSingle);
 router.post("/student/update", studentController.update);
