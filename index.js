@@ -1,11 +1,15 @@
 const express = require("express");
 const app = express();
+
 const db = require("./config/db");
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json());
 
 const adminroutes = require("./routes/apiroutes");
 app.use("/api", adminroutes);
+
+const seeder = require("./config/seeder");
+seeder.admin();
 
 app.use("/", (req, res) => {
   res.send("Welcome");

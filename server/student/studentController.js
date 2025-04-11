@@ -1,4 +1,9 @@
 const Student = require("./studentModel");
+const User = require("../user/userModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const saltRounds = 10;
+const privateKey = "@#97$787@5#8#$";
 
 const add = (req, res) => {
   var validationerror = [];
@@ -6,9 +11,10 @@ const add = (req, res) => {
   if (!req.body.fatherName) validationerror.push("fatherName is required.");
   if (!req.body.motherName) validationerror.push("motherName is required.");
   if (!req.body.studentClass) validationerror.push("studentClass is required.");
-  if (!req.body.studentEmail) validationerror.push("studentEmail is required.");
-  if (!req.body.contectNumber)
-    validationerror.push("contectNumber is required.");
+  if (!req.body.email) validationerror.push("email is required.");
+  if (!req.body.password) validationerror.push("password is required.");
+  if (!req.body.contactNumber)
+    validationerror.push("contactNumber is required.");
   if (!req.body.gender) validationerror.push("gender is required.");
   if (!req.body.dateOfBirth) validationerror.push("dateOfBirth is required.");
   if (!req.body.studentId) validationerror.push("studentId is required.");
@@ -20,45 +26,123 @@ const add = (req, res) => {
       message: "Data not found!",
       error: validationerror,
     });
-  } else {
-    let studentObj = new Student();
-    studentObj.studentName = req.body.studentName;
-    studentObj.fatherName = req.body.fatherName;
-    studentObj.motherName = req.body.motherName;
-    studentObj.studentClass = req.body.studentClass;
-    studentObj.studentEmail = req.body.studentEmail;
-    studentObj.contectNumber = req.body.contectNumber;
-    studentObj.gender = req.body.gender;
-    studentObj.dateOfBirth = req.body.dateOfBirth;
-    studentObj.studentId = req.body.studentId;
-    studentObj.studentPhoto = req.body.studentPhoto;
-    studentObj
-      .save()
-      .then((studentData) => {
-        if (!studentData) {
-          res.send({
-            status: 404,
-            success: false,
-            message: "data not found",
-            data: studentData,
-          });
-        } else {
-          res.send({
-            status: true,
-            message: "Data Loaded!",
-            data: studentData,
-          });
-        }
-      })
-      .catch((err) => {
+  }
+  User.findOne({ email: req.body.email })
+    .then((studentData) => {
+      if (!studentData) {
+        let userObj = new User();
+        userObj.email = req.body.email;
+        userObj.password = bcrypt.hashSync(req.body.password, saltRounds);
+        userObj.userType = 2;
+        userObj.save()
+        .then((studentSave) => {
+          let studentObj = new Student();
+          studentObj.studentName = req.body.studentName;
+          studentObj.fatherName = req.body.fatherName;
+          studentObj.motherName = req.body.motherName;
+          studentObj.studentClass = req.body.studentClass;
+          studentObj.email = req.body.email;
+          studentObj.password = bcrypt.hashSync(req.body.password, saltRounds);
+          studentObj.contactNumber = req.body.contactNumber;
+          studentObj.gender = req.body.gender;
+          studentObj.dateOfBirth = req.body.dateOfBirth;
+          studentObj.studentId = req.body.studentId;
+          studentObj.studentPhoto = "student-images/" + req.body.studentPhoto;
+          studentObj.userId = req.body.userId;
+          studentObj
+            .save()
+            .then((studentData) => {
+              res.send({
+                status: 200,
+                success: true,
+                message: "student register success",
+                data: studentData,
+              });
+            })
+            .catch((err) => {
+              res.send({
+                status: false,
+                message: "Internal server error!",
+                error: err.message,
+              });
+            });
+        });
+      } else {
         res.send({
           status: false,
-          message: "Internal server error!",
-          error: err.message,
+          message: "Record is already exist",
         });
+      }
+    })
+    .catch((err) => {
+      res.send({
+        status: false,
+        message: "Internal server error!",
+        error: err.message,
       });
-  }
+    });
 };
+
+// const login = (req, res) => {
+//   var validationerror = [];
+//   if (!req.body.email) validationerror.push("email is required");
+//   if (!req.body.password) validationerror.push("password is required");
+//   if (validationerror.length > 0) {
+//     res.send({
+//       status: 404,
+//       success: false,
+//       message: "validationerror error occur",
+//       error: validationerror,
+//     });
+//   } else {
+//     User.findOne({ email: req.body.email })
+//       .then((userdata) => {
+//         if (!userdata) {
+//           res.send({
+//             status: 420,
+//             success: false,
+//             message: "invalid email",
+//           });
+//         } else {
+//           bcrypt.compare(
+//             req.body.password,
+//             userdata.password,
+//             (err, result) => {
+//               if (!result) {
+//                 res.send({
+//                   status: 420,
+//                   success: false,
+//                   message: "invalid password",
+//                 });
+//               } else {
+//                 var tokenObj = {
+//                   _id: userdata._id,
+//                   email: userdata.email,
+//                   userType: userdata.userType,
+//                 };
+//                 var token = jwt.sign(tokenObj, privateKey);
+//                 res.send({
+//                   status: 200,
+//                   success: true,
+//                   message: "Login Successfully !!",
+//                   token: token,
+//                   data: userdata,
+//                 });
+//               }
+//             }
+//           );
+//         }
+//       })
+//       .catch((err) => {
+//         res.send({
+//           status: 500,
+//           success: false,
+//           message: "Internal server error",
+//           error: err.message,
+//         });
+//       });
+//   }
+// };
 
 const getAll = (req, res) => {
   Student.find()
@@ -161,11 +245,11 @@ const update = (req, res) => {
           if (req.body.studentClass) {
             studentData.studentClass = req.body.studentClass;
           }
-          if (req.body.studentEmail) {
-            studentData.studentEmail = req.body.studentEmail;
+          if (req.body.email) {
+            studentData.email = req.body.email;
           }
-          if (req.body.contectNumber) {
-            studentData.contectNumber = req.body.contectNumber;
+          if (req.body.contactNumber) {
+            studentData.contactNumber = req.body.contactNumber;
           }
           if (req.body.dateOfBirth) {
             studentData.dateOfBirth = req.body.dateOfBirth;
@@ -177,7 +261,8 @@ const update = (req, res) => {
             studentData.studentId = req.body.studentId;
           }
           if (req.body.studentPhoto) {
-            studentData.studentPhoto = req.body.studentPhoto;
+            studentData.studentPhoto =
+              "student-images/" + req.body.studentPhoto;
           }
           studentData
             .save()
@@ -243,6 +328,7 @@ const deletestudent = (req, res) => {
 
 module.exports = {
   add,
+  // login,
   getAll,
   getSingle,
   update,

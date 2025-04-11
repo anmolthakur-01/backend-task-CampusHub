@@ -4,6 +4,21 @@ const homeworkController = require("../server/homework/homeworkController");
 const noticeController = require("../server/notice/noticeController");
 const publicController = require("../server/publicnotice/publicController");
 const studentController = require("../server/student/studentController");
+const multer = require("multer");
+
+// Multer setup
+const studentStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/student-images");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    var newname = file.fieldname + "-" + uniqueSuffix + file.originalname;
+    req.body["studentPhoto"] = newname;
+    cb(null, newname);
+  },
+});
+const studentUpload = multer({ storage: studentStorage });
 
 // class routes
 router.post("/class/add", classController.add);
@@ -34,7 +49,8 @@ router.post("/public/update", publicController.update);
 router.post("/public/delete", publicController.deletepublic);
 
 // student routes
-router.post("/student/add", studentController.add);
+router.post("/student/add", studentUpload.single('studentPhoto'), studentController.add);
+// router.post("/student/login", studentController.login);
 router.post("/student/getall", studentController.getAll);
 router.post("/student/getsingle", studentController.getSingle);
 router.post("/student/update", studentController.update);
