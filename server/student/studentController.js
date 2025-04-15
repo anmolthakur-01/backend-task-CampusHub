@@ -32,10 +32,9 @@ const add = (req, res) => {
       if (!studentData) {
         let userObj = new User();
         userObj.email = req.body.email;
-        userObj.password = bcrypt.hashSync(req.body.password, saltRounds);
         userObj.userType = 2;
-        userObj.save()
-        .then((studentSave) => {
+        userObj.password = bcrypt.hashSync(req.body.password, saltRounds);
+        userObj.save().then((studentSave) => {
           let studentObj = new Student();
           studentObj.studentName = req.body.studentName;
           studentObj.fatherName = req.body.fatherName;
@@ -52,12 +51,20 @@ const add = (req, res) => {
           studentObj
             .save()
             .then((studentData) => {
-              res.send({
-                status: 200,
-                success: true,
-                message: "student register success",
-                data: studentData,
-              });
+              if (!studentData) {
+                res.send({
+                  status: 420,
+                  success: false,
+                  message: "Failed to save student data!",
+                });
+              }else{   
+                res.send({
+                  status: 200,
+                  success: true,
+                  message: "Student data saved successfully!",
+                  data: studentData,
+                });
+              }
             })
             .catch((err) => {
               res.send({
