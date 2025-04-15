@@ -3,6 +3,7 @@ const app = express();
 
 const db = require("./config/db");
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
 app.use(express.json());
 
 const adminroutes = require("./routes/apiroutes");

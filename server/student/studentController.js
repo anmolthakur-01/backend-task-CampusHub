@@ -27,6 +27,7 @@ const add = (req, res) => {
       error: validationerror,
     });
   }
+
   User.findOne({ email: req.body.email })
     .then((studentData) => {
       if (!studentData) {
@@ -57,7 +58,7 @@ const add = (req, res) => {
                   success: false,
                   message: "Failed to save student data!",
                 });
-              }else{   
+              } else {
                 res.send({
                   status: 200,
                   success: true,
