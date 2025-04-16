@@ -1,7 +1,7 @@
 const Public = require("./publicModel");
 
 const add = (req, res) => {
-  var validationerror = [];
+  let validationerror = [];
   if (!req.body.title) validationerror.push("title is required.");
   if (!req.body.message) validationerror.push("message is required.");
   if (validationerror.length > 0) {

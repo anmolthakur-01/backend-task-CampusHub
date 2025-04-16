@@ -6,26 +6,46 @@ const saltRounds = 10;
 const privateKey = "@#97$787@5#8#$";
 
 const add = (req, res) => {
-  var validationerror = [];
-  if (!req.body.studentName) validationerror.push("studentName is required.");
-  if (!req.body.fatherName) validationerror.push("fatherName is required.");
-  if (!req.body.motherName) validationerror.push("motherName is required.");
-  if (!req.body.studentClass) validationerror.push("studentClass is required.");
-  if (!req.body.email) validationerror.push("email is required.");
-  if (!req.body.password) validationerror.push("password is required.");
-  if (!req.body.contactNumber)
-    validationerror.push("contactNumber is required.");
-  if (!req.body.gender) validationerror.push("gender is required.");
-  if (!req.body.dateOfBirth) validationerror.push("dateOfBirth is required.");
-  if (!req.body.studentId) validationerror.push("studentId is required.");
-  if (!req.body.studentPhoto) validationerror.push("studentPhoto is required.");
-  if (validationerror.length > 0) {
+  // var validationerror = [];
+  // if (!req.body.studentName) validationerror.push("studentName is required.");
+  // if (!req.body.fatherName) validationerror.push("fatherName is required.");
+  // if (!req.body.motherName) validationerror.push("motherName is required.");
+  // if (!req.body.studentClass) validationerror.push("studentClass is required.");
+  // if (!req.body.email) validationerror.push("email is required.");
+  // if (!req.body.password) validationerror.push("password is required.");
+  // if (!req.body.contactNumber)
+  //   validationerror.push("contactNumber is required.");
+  // if (!req.body.gender) validationerror.push("gender is required.");
+  // if (!req.body.dateOfBirth) validationerror.push("dateOfBirth is required.");
+  // if (!req.body.studentId) validationerror.push("studentId is required.");
+  // if (!req.body.studentPhoto) validationerror.push("studentPhoto is required.");
+  // if (validationerror.length > 0) {
+  //   res.send({
+  //     status: 420,
+  //     success: false,
+  //     message: "Data not found!",
+  //     error: validationerror,
+  //   });
+  // }
+  if (
+    !req.body.studentName ||
+    !req.body.fatherName ||
+    !req.body.motherName ||
+    !req.body.studentClass ||
+    !req.body.email ||
+    !req.body.password ||
+    !req.body.contactNumber ||
+    !req.body.gender ||
+    !req.body.dateOfBirth ||
+    !req.body.studentId ||
+    !req.body.studentPhoto
+  ) {
     res.send({
       status: 420,
       success: false,
-      message: "Data not found!",
-      error: validationerror,
+      message: "All fields are required!",
     });
+    
   }
 
   User.findOne({ email: req.body.email })
@@ -35,7 +55,8 @@ const add = (req, res) => {
         userObj.email = req.body.email;
         userObj.userType = 2;
         userObj.password = bcrypt.hashSync(req.body.password, saltRounds);
-        userObj.save().then((studentSave) => {
+        userObj.save()
+        .then((studentSave) => {
           let studentObj = new Student();
           studentObj.studentName = req.body.studentName;
           studentObj.fatherName = req.body.fatherName;
